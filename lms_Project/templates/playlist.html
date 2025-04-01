@@ -1,0 +1,39 @@
+<!-- templates/playlist.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ playlist.name }} - LMS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <h1>Learnify</h1>
+        <div class="nav-links">
+            <a href="{{ url_for('dashboard') }}" class="btn">Dashboard</a>
+            <a href="{{ url_for('library') }}" class="btn">Back to Library</a>
+            <a href="{{ url_for('login') }}" class="btn">Logout</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <h2>{{ playlist.name }}</h2>
+        <div class="courses-grid">
+            {% for course in courses %}
+            <div class="course-card">
+                <div class="video-thumbnail" onclick="window.location.href='{{ url_for('watch_course', course_id=course.id) }}'">
+                    <div class="thumbnail-img" style="background-image: url('{{ url_for('static', filename='uploads/thumbnails/' + course.filename|replace('.mp4', '.jpg')) }}')">
+                        <div class="play-overlay">
+                            <span class="play-icon">▶</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="course-info">
+                    <h3>{{ course.title }}</h3>
+                    <p>{{ course.description }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Downloads - LMS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-top">
+            <h1>Learnify</h1>
+            <div class="navbar-top-right">
+                <a href="{{ url_for('dashboard') }}" class="btn">Dashboard</a>
+                <a href="{{ url_for('login') }}" class="btn">Logout</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <h2>Downloaded Courses</h2>
+        <div class="courses-grid">
+            {% for download in downloads %}
+            <div class="course-card">
+                <div class="video-thumbnail" onclick="window.location.href='{{ url_for('watch_downloaded_course', filename=download.filename) }}'">
+                    <video>
+                        <source src="{{ url_for('static', filename='uploads/downloads/' + session.id|string + '/' + download.filename) }}" type="video/mp4">
+                    </video>
+                </div>
+                <div class="course-info">
+                    <h3>{{ download.title }}</h3>
+                    <p>{{ download.description }}</p>
+                    <div class="course-actions">
+                        <a href="{{ url_for('delete_download', filename=download.filename) }}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this download?')">Delete</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

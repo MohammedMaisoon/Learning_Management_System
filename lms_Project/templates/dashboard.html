@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard - LMS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-top">
+            <h1>Learnify</h1>
+            <div class="navbar-top-right">
+                <form action="{{ url_for('search') }}" method="get" class="search-form">
+                    <input type="text" name="query" placeholder="Search courses...">
+                    <button type="submit">Search</button>
+                </form>
+                <a href="{{ url_for('settings') }}" class="btn">Settings</a>
+                <a href="{{ url_for('login') }}" class="btn">Logout</a>
+            </div>
+        </div>
+        <div class="navbar-bottom">
+            <a href="{{ url_for('dashboard') }}" class="btn">Home</a>
+            <a href="{{ url_for('linkers') }}" class="btn">Linkers</a>
+            <a href="{{ url_for('upload_course') }}" class="btn">Upload Course</a>
+            <a href="{{ url_for('my_uploads') }}" class="btn">My Uploads</a>
+            <a href="{{ url_for('library') }}" class="btn">Library</a>
+            <a href="{{ url_for('downloads') }}" class="btn">Downloads</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <h2>Available Courses</h2>
+        <div class="courses-grid">
+            {% for course in courses %}
+            <div class="course-card">
+                <div class="video-thumbnail" onclick="window.location.href='{{ url_for('watch_course', course_id=course.id) }}'">
+                    <div class="thumbnail-img" style="background-image: url('{{ url_for('static', filename='uploads/thumbnails/' + course.filename|replace('.mp4', '.jpg')) }}')">
+                        <div class="play-overlay">
+                            <span class="play-icon">▶</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="course-info">
+                    <h3>{{ course.title }}</h3>
+                    <p>{{ course.description }}</p>
+                    <div class="course-actions-dropdown">
+                        <span class="three-dots">⋮</span>
+                        <div class="course-actions-dropdown-content">
+                            <a href="#" onclick="showPlaylistModal({{ course.id }})">Add to Playlist</a>
+                            <a href="{{ url_for('download_course', course_id=course.id) }}">Download</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+    function showPlaylistModal(courseId) {
+        fetch('/get_playlists')
+        .then(response => response.json())
+        .then(playlists => {
+            // Create a modal with playlist options
+            const modal = document.createElement('div');
+            modal.className = 'playlist-modal';
+            
+            const modalContent = document.createElement('div');
+            modalContent.className = 'playlist-modal-content';
+            
+            const title = document.createElement('h3');
+            title.textContent = 'Add to Playlist';
+            modalContent.appendChild(title);
+            
+            playlists.forEach(playlist => {
+                const playlistOption = document.createElement('div');
+                playlistOption.textContent = playlist.name;
+                playlistOption.onclick = () => addToSpecificPlaylist(courseId, playlist.id);
+                modalContent.appendChild(playlistOption);
+            });
+            
+            const cancelButton = document.createElement('button');
+            cancelButton.textContent = 'Cancel';
+            cancelButton.onclick = () => modal.remove();
+            modalContent.appendChild(cancelButton);
+            
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+        })
+        .catch(error => {
+            console.error('Error fetching playlists:', error);
+            alert('Failed to load playlists');
+        });
+    }
+    
+    function addToSpecificPlaylist(courseId, playlistId) {
+        fetch(`/add_to_specific_playlist/${courseId}/${playlistId}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Course added to playlist');
+                // Remove the modal
+                document.querySelector('.playlist-modal').remove();
+            } else {
+                alert('Failed to add course to playlist');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to add course to playlist');
+        });
+    }
+    </script>
+</body>
+</html>

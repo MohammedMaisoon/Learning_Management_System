@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ course.title }} - LMS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-top">
+            <h1>Learnify</h1>
+            <div class="navbar-top-right">
+                <a href="{{ url_for('dashboard') }}" class="btn">Back to Dashboard</a>
+                <a href="{{ url_for('login') }}" class="btn">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>{{ course.title }}</h1>
+        <div class="course-content">
+            <video controls width="100%">
+                <source src="{{ url_for('static', filename='uploads/' + course.filename) }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="course-details">
+                <div class="course-info-header">
+                    <div class="uploader-info">
+                        <h3>
+                            <a href="{{ url_for('user_profile', user_id=course.uploader_id) }}" class="uploader-link">
+                                {{ course.username }}
+                            </a>
+                        </h3>
+                        {% if course.uploader_id != session.id %}
+                            {% if is_linked %}
+                                <a href="{{ url_for('unlink_user', uploader_id=course.uploader_id) }}" class="btn btn-danger">Unlink</a>
+                            {% else %}
+                                <a href="{{ url_for('link_user', uploader_id=course.uploader_id) }}" class="btn">Link Profile</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                <h2>Course Description</h2>
+                <p>{{ course.description }}</p>
+                <div class="course-actions-dropdown">
+                    <span class="three-dots">⋮</span>
+                    <div class="course-actions-dropdown-content">
+                        <a href="#" onclick="showPlaylistModal(); return false;">Add to Playlist</a>
+                        <a href="{{ url_for('download_course', course_id=course.id) }}">Download</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="playlistModal" class="playlist-modal" style="display: none;">
+        <div class="playlist-modal-content">
+            <h3>Add to Playlist</h3>
+            <div id="playlistsList">
+            </div>
+            <div class="modal-actions">
+                <button onclick="hidePlaylistModal()" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    function showPlaylistModal() {
+        document.getElementById('playlistModal').style.display = 'flex';
+        loadPlaylists();
+    }
+
+    function hidePlaylistModal() {
+        document.getElementById('playlistModal').style.display = 'none';
+    }
+
+    function loadPlaylists() {
+        fetch('/get_playlists')
+            .then(response => response.json())
+            .then(playlists => {
+                const playlistsList = document.getElementById('playlistsList');
+                playlistsList.innerHTML = '';
+                playlists.forEach(playlist => {
+                    const playlistItem = document.createElement('div');
+                    playlistItem.className = 'playlist-item';
+                    playlistItem.innerHTML = `
+                        <div class="playlist-name">${playlist.name}</div>
+                        <button onclick="addToPlaylist(${playlist.id})" class="btn">Add</button>
+                    `;
+                    playlistsList.appendChild(playlistItem);
+                });
+            });
+    }
+
+    function addToPlaylist(playlistId) {
+        fetch(`/add_to_specific_playlist/{{ course.id }}/${playlistId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Added to playlist successfully!');
+                hidePlaylistModal();
+            } else {
+                alert(data.error || 'Failed to add to playlist');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to add to playlist');
+        });
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('playlistModal');
+        if (event.target == modal) {
+            hidePlaylistModal();
+        }
+    }
+    </script>
+</body>
+</html>

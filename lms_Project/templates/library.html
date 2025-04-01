@@ -1,0 +1,61 @@
+<!-- templates/library.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Library - LMS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <h1>Learnify</h1>
+        <div class="nav-links">
+            <a href="{{ url_for('dashboard') }}" class="btn">Dashboard</a>
+            <a href="{{ url_for('my_uploads') }}" class="btn">My Uploads</a>
+            <a href="{{ url_for('downloads') }}" class="btn">Downloads</a>
+            <a href="{{ url_for('login') }}" class="btn">Logout</a>
+            
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="library-section">
+            <div class="section-header">
+                <h2>My Playlists</h2>
+                <form action="{{ url_for('create_playlist') }}" method="post" class="playlist-form">
+                    <input type="text" name="playlist_name" placeholder="New playlist name" required>
+                    <button type="submit" class="btn">Create Playlist</button>
+                </form>
+            </div>
+            <div class="playlists-grid">
+                {% for playlist in playlists %}
+                <div class="playlist-card">
+                    <h3>{{ playlist.name }}</h3>
+                    <a href="{{ url_for('view_playlist', playlist_id=playlist.id) }}" class="btn">View Playlist</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="library-section">
+            <h2>Watch History</h2>
+            <div class="courses-grid">
+                {% for course in history %}
+                <div class="course-card">
+                    <div class="video-thumbnail" onclick="window.location.href='{{ url_for('watch_course', course_id=course.id) }}'">
+                        <div class="thumbnail-img" style="background-image: url('{{ url_for('static', filename='uploads/thumbnails/' + course.filename|replace('.mp4', '.jpg')) }}')">
+                            <div class="play-overlay">
+                                <span class="play-icon">▶</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="course-info">
+                        <h3>{{ course.title }}</h3>
+                        <p>{{ course.description }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

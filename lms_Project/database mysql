@@ -1,0 +1,75 @@
+-- Create the database
+CREATE DATABASE lms_db;
+
+-- Use the database
+USE lms_db;
+
+-- Create users table
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create courses table
+CREATE TABLE courses (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(200) NOT NULL,
+    description TEXT,
+    filename VARCHAR(255) NOT NULL,
+    user_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Create playlists table
+CREATE TABLE playlists (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    user_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Create playlist_items table
+CREATE TABLE playlist_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    playlist_id INT NOT NULL,
+    course_id INT NOT NULL,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (playlist_id) REFERENCES playlists(id),
+    FOREIGN KEY (course_id) REFERENCES courses(id)
+);
+
+-- Create downloads table
+CREATE TABLE downloads (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    course_id INT,
+    filename VARCHAR(255),
+    downloaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (course_id) REFERENCES courses(id)
+);
+
+-- Create user_links table
+CREATE TABLE user_links (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    linked_user_id INT NOT NULL,
+    linked_at DATETIME NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (linked_user_id) REFERENCES users(id)
+);
+
+-- Create watch_history table
+CREATE TABLE watch_history (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    course_id INT NOT NULL,
+    watched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (course_id) REFERENCES courses(id)
+);

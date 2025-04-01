@@ -1,0 +1,59 @@
+<!-- templates/linkers.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Linkers - LMS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-top">
+            <h1>Learnify</h1>
+            <div class="navbar-top-right">
+                <form action="{{ url_for('search') }}" method="get" class="search-form">
+                    <input type="text" name="query" placeholder="Search courses...">
+                    <button type="submit">Search</button>
+                </form>
+                <a href="{{ url_for('login') }}" class="btn">Logout</a>
+            </div>
+        </div>
+        <div class="navbar-bottom">
+            <a href="{{ url_for('dashboard') }}" class="btn">Home</a>
+            <a href="{{ url_for('linkers') }}" class="btn">Linkers</a>
+            <a href="{{ url_for('upload_course') }}" class="btn">Upload Course</a>
+            <a href="{{ url_for('my_uploads') }}" class="btn">My Uploads</a>
+            <a href="{{ url_for('library') }}" class="btn">Library</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <h2>Linked Profiles</h2>
+        <div class="profiles-grid">
+            {% for user in linked_users %}
+            <div class="profile-card">
+                <div class="profile-info">
+                    <div class="profile-header">
+                        <h3>{{ user.username }}</h3>
+                        <span class="joined-date">Joined {{ user.created_at.strftime('%B %Y') }}</span>
+                    </div>
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <span class="stat-value">{{ user.total_linkers }}</span>
+                            <span class="stat-label">Linkers</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">{{ user.total_courses }}</span>
+                            <span class="stat-label">Courses</span>
+                        </div>
+                    </div>
+                    <div class="profile-actions">
+                        <a href="{{ url_for('user_profile', user_id=user.id) }}" class="btn">View Profile</a>
+                        <a href="{{ url_for('unlink_user', uploader_id=user.id) }}" class="btn btn-danger">Unlink</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

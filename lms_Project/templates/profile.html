@@ -1,0 +1,76 @@
+<!-- templates/profile.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ profile_user.username }}'s Profile - LMS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-top">
+            <h1>Learnify</h1>
+            <div class="navbar-top-right">
+                <form action="{{ url_for('search') }}" method="get" class="search-form">
+                    <input type="text" name="query" placeholder="Search courses...">
+                    <button type="submit">Search</button>
+                </form>
+                <a href="{{ url_for('login') }}" class="btn">Logout</a>
+            </div>
+        </div>
+        <div class="navbar-bottom">
+            <a href="{{ url_for('dashboard') }}" class="btn">Home</a>
+            <a href="{{ url_for('linkers') }}" class="btn">Linkers</a>
+            <a href="{{ url_for('upload_course') }}" class="btn">Upload Course</a>
+            <a href="{{ url_for('my_uploads') }}" class="btn">My Uploads</a>
+            <a href="{{ url_for('library') }}" class="btn">Library</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="profile-header">
+            <div class="profile-info-main">
+                <h2>{{ profile_user.username }}</h2>
+                <span class="joined-date">Joined {{ profile_user.created_at.strftime('%B %Y') }}</span>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <span class="stat-value">{{ profile_user.total_linkers }}</span>
+                        <span class="stat-label">Linkers</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ profile_user.total_courses }}</span>
+                        <span class="stat-label">Courses</span>
+                    </div>
+                </div>
+            </div>
+            {% if profile_user.id != session.id %}
+                <div class="profile-actions">
+                    {% if is_linked %}
+                        <a href="{{ url_for('unlink_user', uploader_id=profile_user.id) }}" class="btn btn-danger">Unlink</a>
+                    {% else %}
+                        <a href="{{ url_for('link_user', uploader_id=profile_user.id) }}" class="btn">Link Profile</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <h3>Uploaded Courses</h3>
+        <div class="courses-grid">
+            {% for course in courses %}
+            <div class="course-card">
+                <div class="video-thumbnail" onclick="window.location.href='{{ url_for('watch_course', course_id=course.id) }}'">
+                    <div class="thumbnail-img" style="background-image: url('{{ url_for('static', filename='uploads/thumbnails/' + course.filename|replace('.mp4', '.jpg')) }}')">
+                        <div class="play-overlay">
+                            <span class="play-icon">▶</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="course-info">
+                    <h3>{{ course.title }}</h3>
+                    <p>{{ course.description }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

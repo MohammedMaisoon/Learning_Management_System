@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Watch Downloaded Course</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <video controls width="100%">
+            <source src="{{ url_for('static', filename='uploads/downloads/' + session.id|string + '/' + filename) }}" type="video/mp4">
+        </video>
+    </div>
+</body>
+</html>
